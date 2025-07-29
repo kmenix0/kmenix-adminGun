@@ -1,11 +1,11 @@
-local ADMIN_GUN_HASH = GetHashKey("WEAPON_RAYPISTOL") -- Up-n-Atomizer
+local ADMIN_GUN_HASH = `WEAPON_RAYPISTOL` -- Up-n-Atomizer
 
 RegisterCommand("admingun", function(source, args)
     GiveWeaponToPed(PlayerPedId(), ADMIN_GUN_HASH, 0, false, true)
 end, false)
 
 RegisterCommand("dv", function(source, args)
-    local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+    local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
     DeleteVehicle(vehicle)
 end, false)
 
@@ -20,20 +20,21 @@ RegisterCommand("car", function(source, args)
     while not HasModelLoaded(vehicle) do
         Wait(0)
     end
+    local currentVehicle = GetVehiclePedIsIn(PlayerPedId, true)
+    if currentVehicle ~= 0 then DeleteVehicle(currentVehicle) end
     spawnedVeh = CreateVehicle(vehicle, GetEntityCoords(PlayerPedId), GetEntityHeading(PlayerPedId))
     TaskWarpPedIntoVehicle(PlayerPedId, spawnedVeh, -1)
 end, false)
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
-        Citizen.Wait(0)
+        Wait(0)
         local playerPed = PlayerPedId()
         local _, weapon = GetCurrentPedWeapon(playerPed, true)
 
         if weapon == ADMIN_GUN_HASH then
-            -- Zablokowanie strzału poprzez ustawienie amunicji na 0
             SetPedAmmo(playerPed, ADMIN_GUN_HASH, 0)
-            DisablePlayerFiring(playerPed, true) -- Blokada strzału
+            DisablePlayerFiring(playerPed, true)
             
             if IsPlayerFreeAiming(PlayerId()) then
                 local entity = getEntityPlayerIsLookingAt()
@@ -47,18 +48,14 @@ Citizen.CreateThread(function()
                     drawText(string.format("~y~Name: ~w~%s~n~~y~Coords: ~w~%.2f, %.2f, %.2f~n~~y~Heading: ~w~%.2f", 
                         modelName, coords.x, coords.y, coords.z, heading))
 
-                    -- if IsControlJustPressed(0, 38) then -- LPM
-                    --     DeleteEntity(entity)
-                    --     ShowNotification("~w~Obiekt usunięty!")
-                    -- end
                     if IsControlJustPressed(0, 27) then -- SCROLLWHEEL BUTTON
                         print("\nName: " .. modelName .. "\nHandles: " .. propHandles .. "\nCoords: " .. coords .. "\nHeading: " .. heading)
                         ShowNotification("~w~Wysłano do konsoli!")
                     end
-                else
-                    -- drawText("~r~Nie celujesz w żaden obiekt!")
                 end
             end
+        else
+            Wait(250)
         end
     end
 end)
