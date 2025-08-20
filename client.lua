@@ -35,11 +35,11 @@ CreateThread(function()
         if weapon == ADMIN_GUN_HASH then
             SetPedAmmo(playerPed, ADMIN_GUN_HASH, 0)
             DisablePlayerFiring(playerPed, true)
+            local player = PlayerId()
             
-            if IsPlayerFreeAiming(PlayerId()) then
-                local entity = getEntityPlayerIsLookingAt()
+            if IsPlayerFreeAiming(player) then
+                local aiming, entity = GetEntityPlayerIsFreeAimingAt(player)
                 local modelName = GetEntityArchetypeName(entity)
-                local propHandles = entity
 
                 if entity and DoesEntityExist(entity) then
                     local coords = GetEntityCoords(entity)
@@ -49,7 +49,7 @@ CreateThread(function()
                         modelName, coords.x, coords.y, coords.z, heading))
 
                     if IsControlJustPressed(0, 27) then -- SCROLLWHEEL BUTTON
-                        print("\nName: " .. modelName .. "\nHandles: " .. propHandles .. "\nCoords: " .. coords .. "\nHeading: " .. heading)
+                        print("\nName: " .. modelName .. "\nHandles: " .. entity .. "\nCoords: " .. coords .. "\nHeading: " .. heading)
                         ShowNotification("~w~Wysłano do konsoli!")
                     end
                 end
@@ -60,29 +60,29 @@ CreateThread(function()
     end
 end)
 
-function getEntityPlayerIsLookingAt()
-    local playerPed = PlayerPedId()
-    local playerCoords = GetEntityCoords(playerPed)
-    local forwardVector = GetEntityForwardVector(playerPed)
-    local rayEnd = vector3(playerCoords.x + forwardVector.x * 10.0, playerCoords.y + forwardVector.y * 10.0, playerCoords.z + forwardVector.z * 10.0)
+-- function getEntityPlayerIsLookingAt()
+--     local playerPed = PlayerPedId()
+--     local playerCoords = GetEntityCoords(playerPed)
+--     local forwardVector = GetEntityForwardVector(playerPed)
+--     local rayEnd = vector3(playerCoords.x + forwardVector.x * 10.0, playerCoords.y + forwardVector.y * 10.0, playerCoords.z + forwardVector.z * 10.0)
 
-    local hit, entity = GetRaycastResult(playerCoords, rayEnd)
+--     local hit, entity = GetRaycastResult(playerCoords, rayEnd)
 
-    if hit and entity and DoesEntityExist(entity) then
-        return entity
-    end
-    return nil
-end
+--     if hit and entity and DoesEntityExist(entity) then
+--         return entity
+--     end
+--     return nil
+-- end
 
-function GetRaycastResult(from, to)
-    local shapeTest = StartShapeTestRay(from.x, from.y, from.z, to.x, to.y, to.z, 16, PlayerPedId(), 0)
-    local retval, hit, _, _, entity = GetShapeTestResult(shapeTest)
+-- function GetRaycastResult(from, to)
+--     local shapeTest = StartShapeTestRay(from.x, from.y, from.z, to.x, to.y, to.z, 16, PlayerPedId(), 0)
+--     local retval, hit, _, _, entity = GetShapeTestResult(shapeTest)
 
-    if hit == 1 and DoesEntityExist(entity) then
-        return true, entity
-    end
-    return false, nil
-end
+--     if hit == 1 and DoesEntityExist(entity) then
+--         return true, entity
+--     end
+--     return false, nil
+-- end
 
 function drawText(text)
     SetTextFont(0)
